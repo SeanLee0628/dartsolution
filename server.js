@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 
@@ -41,8 +41,6 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Domestic Proxy Server running on http://localhost:${PORT}`);
-    console.log(`- Proxying /api -> https://opendart.fss.or.kr/api`);
-    console.log(`- Proxying /stock-api -> http://apis.data.go.kr/...`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Domestic Proxy Server running on port ${PORT}`);
 });
