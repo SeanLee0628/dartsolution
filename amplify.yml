@@ -3,30 +3,29 @@
 version: 1
 frontend:
   phases:
-    preBuild:
-      commands:
-        - npm install
     build:
       commands:
-        - npm run build
+        # Since this is a simple static site without a framework build step,
+        # we copy the contents of the 'public' folder to the root so strict fetches like '/corp_codes.json' work.
+        - cp -r public/* .
   artifacts:
-    baseDirectory: dist
+    # We serve files directly from the project root
+    baseDirectory: .
     files:
       - '**/*'
   cache:
-    paths:
-      - node_modules/**/*
+    paths: []
   customHeaders:
     - pattern: '**/*'
       headers:
         - key: 'Cache-Control'
           value: 'public, max-age=0, must-revalidate'
-# Redirects for Single Page App (SPA) fallback
     - pattern: '/index.html'
       headers:
         - key: 'Cache-Control'
           value: 'no-cache'
 rewrites:
+  # Maintain rewrites in case we revert to relative paths in the future
   - source: /api/<*>
     target: https://opendart.fss.or.kr/api/<*>
     status: 200
