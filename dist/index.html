@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DART 기업 재무정보 쿼리</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-CwQGA-qv.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-ClDGYMve.css">
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <div class="container">
+                <h1>DART <span>Finance Insight</span></h1>
+                <p>기업명을 검색하여 분기별 핵심 재무 지표를 확인하세요.</p>
+            </div>
+        </header>
+
+        <main class="container">
+            <section class="search-section">
+                <div class="search-box">
+                    <input type="text" id="companyInput" placeholder="회사명을 입력하세요 (예: 삼성전자)" autocomplete="off">
+                    <button id="searchBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        검색
+                    </button>
+                </div>
+                <div id="search-status" class="status-msg"></div>
+            </section>
+
+            <section id="results-section" class="results-section hidden">
+                <div class="company-header">
+                    <h2 id="displayCompanyName">-</h2>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table id="financeTable">
+                            <thead>
+                                <tr id="tableHeader">
+                                    <th>항목</th>
+                                    <!-- Quarters will be added here -->
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Data rows will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <div id="loading-overlay" class="hidden">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <div class="loading-text">데이터를 분석하고 있습니다...</div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2025 Finance Insight. Powered by Open DART API.</p>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

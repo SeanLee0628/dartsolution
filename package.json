@@ -2,18 +2,12 @@
     "name": "dart-query-app",
     "private": true,
     "version": "0.0.0",
-    "type": "module",
     "scripts": {
-        "dev": "vite",
-        "start": "node server.js",
-        "build": "npx vite build",
-        "preview": "vite preview",
-        "postinstall": "npm run build"
+        "start": "node server.js"
     },
     "dependencies": {
-        "vite": "^5.4.1",
         "cors": "^2.8.5",
-        "express": "^5.2.1",
-        "http-proxy-middleware": "^3.0.5"
+        "express": "^4.18.2",
+        "http-proxy-middleware": "^2.0.6"
     }
 }
