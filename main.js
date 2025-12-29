@@ -331,8 +331,23 @@ function showLoading(show) {
 async function fetchStockData(corpName, beginBasDt, endBasDt) {
     try {
         const url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        console.log('Fetching Stock URL:', url);
         const response = await fetch(url);
-        const data = await response.json();
+
+        if (!response.ok) {
+            const text = await response.text();
+            console.error(`Stock API Error (${response.status}):`, text);
+            throw new Error(`Stock API returned ${response.status}`);
+        }
+
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Failed to parse Stock API response:', text);
+            throw new Error('Invalid JSON response from Stock API');
+        }
 
         const items = data.response?.body?.items?.item || [];
         const quarterlyData = {};
