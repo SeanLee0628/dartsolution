@@ -24,7 +24,7 @@ app.use('/api', createProxyMiddleware({
 
 // 2. 공공데이터포털(주식) API 프록시
 app.use('/stock-api', createProxyMiddleware({
-    target: 'http://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService',
+    target: 'https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService',
     changeOrigin: true,
     pathRewrite: (path, req) => {
         // Remove /stock-api and then remove trailing slash before query string

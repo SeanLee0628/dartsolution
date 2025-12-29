@@ -11,13 +11,13 @@
 
 [[redirects]]
   from = "/stock-api/getStockPriceInfo/"
-  to = "http://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo"
+  to = "https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo"
   status = 200
   force = true
 
 [[redirects]]
   from = "/stock-api/*"
-  to = "http://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/:splat"
+  to = "https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/:splat"
   status = 200
   force = true
 

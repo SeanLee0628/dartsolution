@@ -1,5 +1,5 @@
 const API_KEY = '577d4d3fff35faf9705ef7383b323d98e87a84bd';
-const STOCK_API_KEY = decodeURIComponent('87d0bffe5d1544a89e2d299ad91baff546740fd4e83ccf0b4d2986c804c8b8b7'); // User provided
+const STOCK_API_KEY = 'bca5a5100e6f2cd18d353e528aa011ce29fdfe1e538fdf50b66298b754f87d3b'; // User provided
 const BASE_URL = '/api'; // Proxied by Vite
 const STOCK_BASE_URL = '/stock-api';
 
