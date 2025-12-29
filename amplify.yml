@@ -1,0 +1,38 @@
+
+# This file is for AWS Amplify Hosting configuration
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm install
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+  customHeaders:
+    - pattern: '**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'public, max-age=0, must-revalidate'
+# Redirects for Single Page App (SPA) fallback
+    - pattern: '/index.html'
+      headers:
+        - key: 'Cache-Control'
+          value: 'no-cache'
+rewrites:
+  - source: /api/<*>
+    target: https://opendart.fss.or.kr/api/<*>
+    status: 200
+  - source: /stock-api/<*>
+    target: https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/<*>
+    status: 200
+  - source: /<*>
+    target: /index.html
+    status: 200

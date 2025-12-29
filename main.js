@@ -95,7 +95,7 @@ async function searchCompany(name) {
 }
 
 async function searchCompanyViaAPI(name) {
-    const url = `${BASE_URL}/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
+    const url = `https://opendart.fss.or.kr/api/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
     const response = await fetch(url);
     if (!response.ok) {
         const errorText = await response.text();
@@ -138,7 +138,7 @@ async function fetchFinancialData(corpCode) {
         for (let i = 0; i < qList.length; i += 5) {
             const chunk = qList.slice(i, i + 5);
             const promises = chunk.map(target =>
-                fetch(`${BASE_URL}/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`)
+                fetch(`https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`)
                     .then(async res => {
                         if (!res.ok) {
                             const errorText = await res.text();
