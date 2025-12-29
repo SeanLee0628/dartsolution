@@ -28,9 +28,6 @@ let corpCodesMap = null;
 async function loadCorpCodes() {
     if (corpCodesMap) return corpCodesMap;
     try {
-        // Use absolute URL to bypass potential proxy issues
-        // const response = await fetch(`https://opendart.fss.or.kr/api/corpCode.xml`); // Note: CorpCode is usually XML or requires ZIP. Checking generic call first.
-        // Actually corp_codes.json seems to be a local file. Keeping it as is if it is local.
         const response = await fetch('/corp_codes.json');
         if (!response.ok) {
             throw new Error(`Failed to load corp_codes.json: ${response.status}`);
@@ -71,8 +68,6 @@ async function searchCompany(name) {
         // 3. Partial match (Case-insensitive)
         const partialMatches = keys.filter(k => k.toLowerCase().includes(lowerName));
         if (partialMatches.length > 0) {
-            // Sort to find the shortest match which is usually the most likely intent (e.g. '삼성전자' vs '삼성전자우')
-            // But prefer matches that start with the query
             partialMatches.sort((a, b) => {
                 const aStarts = a.toLowerCase().startsWith(lowerName);
                 const bStarts = b.toLowerCase().startsWith(lowerName);
@@ -94,19 +89,17 @@ async function searchCompany(name) {
 }
 
 async function searchCompanyViaAPI(name) {
-    // Use AllOrigins proxy to bypass CORS restrictions
-    // Use AllOrigins proxy to bypass CORS restrictions
-    const dartUrl = `https://opendart.fss.or.kr/api/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
-    const url = `https://api.allorigins.win/get?url=${encodeURIComponent(dartUrl)}`;
-    console.log('Final Search URL:', url);
+    // Use Amplify Rewrite proxy (configured in amplify.yml)
+    const url = `/api/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
+    console.log('Search URL:', url);
 
     const response = await fetch(url);
     if (!response.ok) {
-        throw new Error(`Proxy returned ${response.status}`);
+        const errorText = await response.text();
+        console.error(`DART API Error (${response.status}): ${response.statusText}`, errorText);
+        throw new Error(`DART API returned ${response.status}`);
     }
-    const wrapper = await response.json();
-    if (!wrapper.contents) throw new Error('No content in proxy response');
-    const data = JSON.parse(wrapper.contents);
+    const data = await response.json();
     if (data.status === '000') {
         const match = data.list[0];
         currentCorpCode = match.corp_code;
@@ -142,29 +135,23 @@ async function fetchFinancialData(corpCode) {
         for (let i = 0; i < qList.length; i += 5) {
             const chunk = qList.slice(i, i + 5);
             const promises = chunk.map(target => {
-                // Use AllOrigins proxy to bypass CORS restrictions
-                const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`;
-                // Use 'get' endpoint to retrieve content inside JSON wrapper (less brittle than raw)
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(dartUrl)}`;
-                console.log('Final URL:', proxyUrl);
+                // Use Amplify Rewrite proxy
+                const url = `/api/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`;
 
-                return fetch(proxyUrl)
+                return fetch(url)
                     .then(async res => {
                         if (!res.ok) {
-                            throw new Error(`Proxy returned ${res.status}`);
+                            const errorText = await res.text();
+                            console.error(`DART API Error (${res.status}): ${res.statusText}`, errorText);
+                            throw new Error(`DART API returned ${res.status}`);
                         }
                         return res.json();
                     })
-                    .then(wrapper => {
-                        // The actual API response is in wrapper.contents which is a string
-                        if (!wrapper.contents) throw new Error('No content in proxy response');
-                        const data = JSON.parse(wrapper.contents);
-                        return {
-                            year: target.year,
-                            q: target.q,
-                            data: data.status === '000' ? processFinancialList(data.list) : { error: data.message }
-                        };
-                    })
+                    .then(data => ({
+                        year: target.year,
+                        q: target.q,
+                        data: data.status === '000' ? processFinancialList(data.list) : { error: data.message }
+                    }))
             });
             const chunkResults = await Promise.all(promises);
             results.push(...chunkResults);
@@ -361,20 +348,19 @@ function showLoading(show) {
 
 async function fetchStockData(corpName, beginBasDt, endBasDt) {
     try {
-        // Use AllOrigins proxy to bypass CORS restrictions
-        const stockApiUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
-        const url = `https://api.allorigins.win/get?url=${encodeURIComponent(stockApiUrl)}`;
+        // Use Amplify Rewrite proxy
+        const url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
 
-        console.log('Final Stock URL:', url);
+        console.log('Fetching Stock URL:', url);
         const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(`Proxy returned ${response.status}`);
+            const text = await response.text();
+            console.error(`Stock API Error (${response.status}):`, text);
+            throw new Error(`Stock API returned ${response.status}`);
         }
 
-        const wrapper = await response.json();
-        // The data.go.kr API returns JSON text inside the contents
-        const text = wrapper.contents;
+        const text = await response.text();
         let data;
         try {
             data = JSON.parse(text);
@@ -463,34 +449,3 @@ ELEMENTS.searchBtn.addEventListener('click', handleSearch);
 ELEMENTS.companyInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSearch();
 });
- 
- / /   T e s t   f u n c t i o n   f o r   D A R T   A P I  
- w i n d o w . t e s t D a r t A p i   =   a s y n c   f u n c t i o n   ( )   {  
-         c o n s t   c o r p C o d e   =   ' 0 0 1 2 6 3 8 0 ' ;   / /   S a m s u n g   E l e c t r o n i c s   e x a m p l e   c o d e  
-         c o n s t   y e a r   =   ' 2 0 2 4 ' ;  
-         c o n s t   r e p o r t C o d e   =   ' 1 1 0 1 1 ' ;   / /   A n n u a l   R e p o r t  
-         c o n s t   d a r t U r l   =   ` h t t p s : / / o p e n d a r t . f s s . o r . k r / a p i / f n l t t S i n g l A c n t A l l . j s o n ? c r t f c _ k e y = $ { A P I _ K E Y } & c o r p _ c o d e = $ { c o r p C o d e } & b s n s _ y e a r = $ { y e a r } & r e p r t _ c o d e = $ { r e p o r t C o d e } & f s _ d i v = C F S ` ;  
-         c o n s t   p r o x y U r l   =   ` h t t p s : / / a p i . a l l o r i g i n s . w i n / g e t ? u r l = $ { e n c o d e U R I C o m p o n e n t ( d a r t U r l ) } ` ;  
-  
-         c o n s o l e . l o g ( ' - - -   T E S T   D A R T   A P I   S T A R T   - - - ' ) ;  
-         c o n s o l e . l o g ( ' T a r g e t   U R L : ' ,   d a r t U r l ) ;  
-         c o n s o l e . l o g ( ' P r o x y   U R L : ' ,   p r o x y U r l ) ;  
-  
-         t r y   {  
-                 c o n s t   r e s   =   a w a i t   f e t c h ( p r o x y U r l ) ;  
-                 c o n s t   w r a p p e r   =   a w a i t   r e s . j s o n ( ) ;  
-                 c o n s o l e . l o g ( ' P r o x y   R e s p o n s e   S t a t u s : ' ,   r e s . s t a t u s ) ;  
-                 c o n s o l e . l o g ( ' W r a p p e r   C o n t e n t s : ' ,   w r a p p e r . c o n t e n t s ) ;  
-  
-                 t r y   {  
-                         c o n s t   d a t a   =   J S O N . p a r s e ( w r a p p e r . c o n t e n t s ) ;  
-                         c o n s o l e . l o g ( ' P a r s e d   D a t a : ' ,   d a t a ) ;  
-                 }   c a t c h   ( e )   {  
-                         c o n s o l e . e r r o r ( ' F a i l e d   t o   p a r s e   w r a p p e r   c o n t e n t s   a s   J S O N ' ,   e ) ;  
-                 }  
-         }   c a t c h   ( e r r )   {  
-                 c o n s o l e . e r r o r ( ' T e s t   F a i l e d : ' ,   e r r ) ;  
-         }  
-         c o n s o l e . l o g ( ' - - -   T E S T   D A R T   A P I   E N D   - - - ' ) ;  
- } ;  
- 
