@@ -27,7 +27,8 @@ app.use('/stock-api', createProxyMiddleware({
     target: 'http://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService',
     changeOrigin: true,
     pathRewrite: (path, req) => {
-        return path.replace('/stock-api', '').replace(/\/$/, '');
+        // Remove /stock-api and then remove trailing slash before query string
+        return path.replace('/stock-api', '').replace(/\/(\?|$)/, '$1');
     },
     onProxyRes: (proxyRes, req, res) => {
         proxyRes.headers['Access-Control-Allow-Origin'] = '*';

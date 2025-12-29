@@ -330,7 +330,9 @@ function showLoading(show) {
 
 async function fetchStockData(corpName, beginBasDt, endBasDt) {
     try {
-        const url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        let url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        // Safety check: remove any double slashes or trailing slash before ?
+        url = url.replace(/([^:]\/)\/+/g, '$1').replace(/\/(\?|$)/, '$1');
         console.log('Fetching Stock URL:', url);
         const response = await fetch(url);
 

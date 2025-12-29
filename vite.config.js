@@ -11,7 +11,7 @@ export default defineConfig({
       '/stock-api': {
         target: 'http://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/stock-api/, '').replace(/\/$/, '')
+        rewrite: (path) => path.replace(/^\/stock-api/, '').replace(/\/(\?|$)/, '$1')
       }
     }
   }
