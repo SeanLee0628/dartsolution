@@ -341,11 +341,10 @@ function showLoading(show) {
 
 async function fetchStockData(corpName, beginBasDt, endBasDt) {
     try {
-        // Use absolute URL as requested by user. Note: This may cause CORS issues if the API does not support it.
-        const stockUrlBase = 'https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService';
-        let url = `${stockUrlBase}/getStockPriceInfo?serviceKey=${encodeURIComponent(STOCK_API_KEY)}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
-        // Safety check: remove any double slashes or trailing slash before ?
-        url = url.replace(/([^:]\/)\/+/g, '$1').replace(/\/(\?|$)/, '$1');
+        // Reverting to Proxy as direct calls might fail due to CORS
+        // The Proxy is configured to point to https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService
+        let url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${encodeURIComponent(STOCK_API_KEY)}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+
         console.log('Fetching Stock URL:', url);
         const response = await fetch(url);
 
