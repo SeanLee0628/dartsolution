@@ -1,1 +1,3 @@
+/api/* https://opendart.fss.or.kr/api/:splat 200
+/stock-api/* http://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/:splat 200
 /* /index.html 200
