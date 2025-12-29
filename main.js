@@ -1,5 +1,5 @@
 const API_KEY = '577d4d3fff35faf9705ef7383b323d98e87a84bd';
-const STOCK_API_KEY = '87d0bffe5d1544a89e2d299ad91baff546740fd4e83ccf0b4d2986c804c8b8b7'; // User provided
+const STOCK_API_KEY = decodeURIComponent('87d0bffe5d1544a89e2d299ad91baff546740fd4e83ccf0b4d2986c804c8b8b7'); // User provided
 const BASE_URL = '/api'; // Proxied by Vite
 const STOCK_BASE_URL = '/stock-api';
 
@@ -330,7 +330,9 @@ function showLoading(show) {
 
 async function fetchStockData(corpName, beginBasDt, endBasDt) {
     try {
-        let url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        // Use absolute URL as requested by user. Note: This may cause CORS issues if the API does not support it.
+        const stockUrlBase = 'https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService';
+        let url = `${stockUrlBase}/getStockPriceInfo?serviceKey=${encodeURIComponent(STOCK_API_KEY)}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
         // Safety check: remove any double slashes or trailing slash before ?
         url = url.replace(/([^:]\/)\/+/g, '$1').replace(/\/(\?|$)/, '$1');
         console.log('Fetching Stock URL:', url);
