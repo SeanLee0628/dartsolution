@@ -7,12 +7,11 @@
         "dev": "vite",
         "start": "node server.js",
         "build": "npx vite build",
-        "preview": "vite preview"
-    },
-    "devDependencies": {
-        "vite": "^5.4.1"
+        "preview": "vite preview",
+        "postinstall": "npm run build"
     },
     "dependencies": {
+        "vite": "^5.4.1",
         "cors": "^2.8.5",
         "express": "^5.2.1",
         "http-proxy-middleware": "^3.0.5"
