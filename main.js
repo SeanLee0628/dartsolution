@@ -135,10 +135,12 @@ async function fetchFinancialData(corpCode) {
         for (let i = 0; i < qList.length; i += 5) {
             const chunk = qList.slice(i, i + 5);
             const promises = chunk.map(target => {
-                // Use Amplify Rewrite proxy
-                const url = `/api/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`;
+                // Construct absolute URL for DART API
+                const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`;
+                // Use AllOrigins Raw Proxy and encode the target URL
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(dartUrl)}`;
 
-                return fetch(url)
+                return fetch(proxyUrl)
                     .then(async res => {
                         if (!res.ok) {
                             const errorText = await res.text();
