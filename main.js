@@ -1,6 +1,5 @@
 const API_KEY = '577d4d3fff35faf9705ef7383b323d98e87a84bd';
 const STOCK_API_KEY = 'bca5a5100e6f2cd18d353e528aa011ce29fdfe1e538fdf50b66298b754f87d3b'; // User provided
-const BASE_URL = 'https://opendart.fss.or.kr/api'; // Direct DART API URL as requested
 const STOCK_BASE_URL = '/stock-api';
 
 const ELEMENTS = {
