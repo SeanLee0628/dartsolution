@@ -33,6 +33,9 @@ async function loadCorpCodes() {
         // const response = await fetch(`https://opendart.fss.or.kr/api/corpCode.xml`); // Note: CorpCode is usually XML or requires ZIP. Checking generic call first.
         // Actually corp_codes.json seems to be a local file. Keeping it as is if it is local.
         const response = await fetch('/corp_codes.json');
+        if (!response.ok) {
+            throw new Error(`Failed to load corp_codes.json: ${response.status}`);
+        }
         corpCodesMap = await response.json();
         return corpCodesMap;
     } catch (err) {
@@ -95,7 +98,9 @@ async function searchCompanyViaAPI(name) {
     const url = `${BASE_URL}/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
     const response = await fetch(url);
     if (!response.ok) {
-        throw new Error(`DART API returned ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error(`DART API Error (${response.status}): ${response.statusText}`, errorText);
+        throw new Error(`DART API returned ${response.status}`);
     }
     const data = await response.json();
     if (data.status === '000') {
@@ -136,6 +141,8 @@ async function fetchFinancialData(corpCode) {
                 fetch(`${BASE_URL}/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`)
                     .then(async res => {
                         if (!res.ok) {
+                            const errorText = await res.text();
+                            console.error(`DART API Error (${res.status}): ${res.statusText}`, errorText);
                             throw new Error(`DART API returned ${res.status}`);
                         }
                         return res.json();
