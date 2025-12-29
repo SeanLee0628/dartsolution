@@ -352,9 +352,9 @@ function showLoading(show) {
 
 async function fetchStockData(corpName, beginBasDt, endBasDt) {
     try {
-        // Reverting to Proxy as direct calls might fail due to CORS
-        // The Proxy is configured to point to https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService
-        let url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${encodeURIComponent(STOCK_API_KEY)}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        // Use AllOrigins proxy to bypass CORS restrictions
+        const stockApiUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(stockApiUrl)}`;
 
         console.log('Fetching Stock URL:', url);
         const response = await fetch(url);
