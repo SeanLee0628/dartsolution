@@ -138,11 +138,11 @@ async function fetchFinancialData(corpCode) {
         // Fetch in chunks of 5 to avoid browser request limits/API throttling
         for (let i = 0; i < qList.length; i += 5) {
             const chunk = qList.slice(i, i + 5);
-            const promises = chunk.map(target =>
+            const promises = chunk.map(target => {
                 // Use AllOrigins proxy to bypass CORS restrictions
                 const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`;
                 const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(dartUrl)}`;
-                fetch(proxyUrl)
+                return fetch(proxyUrl)
                     .then(async res => {
                         if (!res.ok) {
                             const errorText = await res.text();
@@ -156,7 +156,7 @@ async function fetchFinancialData(corpCode) {
                         q: target.q,
                         data: data.status === '000' ? processFinancialList(data.list) : { error: data.message }
                     }))
-            );
+            });
             const chunkResults = await Promise.all(promises);
             results.push(...chunkResults);
         }
