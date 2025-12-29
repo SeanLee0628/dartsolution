@@ -89,11 +89,14 @@ async function searchCompany(name) {
 }
 
 async function searchCompanyViaAPI(name) {
-    // Use Amplify Rewrite proxy (configured in amplify.yml)
-    const url = `/api/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
-    console.log('Search URL:', url);
+    // Construct absolute URL for DART API
+    const dartUrl = `https://opendart.fss.or.kr/api/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
+    // Use AllOrigins Raw Proxy and encode the target URL to avoid 400/404 errors
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(dartUrl)}`;
 
-    const response = await fetch(url);
+    console.log('Search URL:', proxyUrl);
+
+    const response = await fetch(proxyUrl);
     if (!response.ok) {
         const errorText = await response.text();
         console.error(`DART API Error (${response.status}): ${response.statusText}`, errorText);
