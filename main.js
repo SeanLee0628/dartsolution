@@ -29,6 +29,9 @@ let corpCodesMap = null;
 async function loadCorpCodes() {
     if (corpCodesMap) return corpCodesMap;
     try {
+        // Use absolute URL to bypass potential proxy issues
+        // const response = await fetch(`https://opendart.fss.or.kr/api/corpCode.xml`); // Note: CorpCode is usually XML or requires ZIP. Checking generic call first.
+        // Actually corp_codes.json seems to be a local file. Keeping it as is if it is local.
         const response = await fetch('/corp_codes.json');
         corpCodesMap = await response.json();
         return corpCodesMap;
@@ -89,7 +92,7 @@ async function searchCompany(name) {
 }
 
 async function searchCompanyViaAPI(name) {
-    const url = `${BASE_URL}/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
+    const url = `https://opendart.fss.or.kr/api/list.json?crtfc_key=${API_KEY}&corp_name=${encodeURIComponent(name)}&bgn_de=20240101`;
     const response = await fetch(url);
     const data = await response.json();
     if (data.status === '000') {
@@ -127,7 +130,7 @@ async function fetchFinancialData(corpCode) {
         for (let i = 0; i < qList.length; i += 5) {
             const chunk = qList.slice(i, i + 5);
             const promises = chunk.map(target =>
-                fetch(`${BASE_URL}/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`)
+                fetch(`https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json?crtfc_key=${API_KEY}&corp_code=${corpCode}&bsns_year=${target.year}&reprt_code=${REPORT_CODES[target.q]}&fs_div=CFS`)
                     .then(res => res.json())
                     .then(data => ({
                         year: target.year,
