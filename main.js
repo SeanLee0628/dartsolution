@@ -348,11 +348,13 @@ function showLoading(show) {
 
 async function fetchStockData(corpName, beginBasDt, endBasDt) {
     try {
-        // Use Amplify Rewrite proxy
-        const url = `${STOCK_BASE_URL}/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        // Construct absolute URL for Stock API (Public Data Portal)
+        const stockApiUrl = `https://apis.data.go.kr/1160100/service/GetStockSecuritiesInfoService/getStockPriceInfo?serviceKey=${STOCK_API_KEY}&numOfRows=5000&resultType=json&itmsNm=${encodeURIComponent(corpName)}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`;
+        // Use AllOrigins Raw Proxy and encode the target URL
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(stockApiUrl)}`;
 
-        console.log('Fetching Stock URL:', url);
-        const response = await fetch(url);
+        console.log('Fetching Stock URL:', proxyUrl);
+        const response = await fetch(proxyUrl);
 
         if (!response.ok) {
             const text = await response.text();
